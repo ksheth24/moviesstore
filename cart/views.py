@@ -51,6 +51,19 @@ def purchase(request):
         item.order = order
         item.quantity = cart[str(movie.id)]
         item.save()
+        # Decrement stock count if amount_left is set (not unlimited)
+        try:
+            qty = int(cart[str(movie.id)])
+        except Exception:
+            qty = 0
+        if movie.amount_left is not None:
+            # compute new amount and ensure it doesn't go negative
+            new_amount = movie.amount_left - qty
+            if new_amount <= 0:
+                movie.amount_left = 0
+            else:
+                movie.amount_left = new_amount
+            movie.save()
     request.session['cart'] = {}
     template_data = {}
     template_data['title'] = 'Purchase confirmation'

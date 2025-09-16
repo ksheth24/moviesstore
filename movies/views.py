@@ -8,7 +8,8 @@ def index(request):
     if search_term:
         movies = Movie.objects.filter(name__icontains=search_term)
     else:
-        movies = Movie.objects.all()
+        # Exclude movies that are explicitly out of stock (amount_left == 0)
+        movies = Movie.objects.exclude(amount_left=0).all()
     template_data = {}
     template_data['title'] = 'Movies'
     template_data['movies'] = movies
